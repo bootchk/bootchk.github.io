@@ -1,6 +1,6 @@
 ---
 layout: default
-title: My interests
+title: About
 ---
 
 I am maintainer for the GIMP plugin [Resynthesizer](https://github.com/bootchk/resynthesizer).  
