@@ -12,10 +12,16 @@ To measure light, you reverse bias the LED, which charges its internal capacitan
 (There are other techniques.)
 
 Using GPIO pins, each leg of the LED uses a GPIO pin.
-When using the LED as a light source, you forward bias by configuring both GPIO pins as output, first high and second low.
-+ --->|--- -
+When using the LED as a light source, you forward bias by configuring both GPIO pins as output, first high and second low. 
+
+```
+positive --->|--- negative
+```
+
 When using the LED as a light sensor, you first reverse bias by configuring both GPIO pins as output, first low and second high.
-- --->|--- +
+
+> negative --->|--- positive
+
 (the LED will not light up.  It takes an infinitesmal time to charge up as a capacitor.)
 Then you configure the second pin as an input, and wait for it to go low.
 
@@ -41,11 +47,11 @@ Some results, not rigorous...
 Light level | lux | mSec
 --- | --- | ---
 Direct sun | 100k | not measured
-Bright sky | 10k | not measured
-Overcast day/drafting light | 1000 | 5
+Bright sky (shaded) | 10k | not measured
+Overcast day/drafting light | 1k | 5
 Home interior | 100 | 50
 Unlit basement | 10 | 500 (0.5 seconds)
-Full moon night | 1 | 2000 (2 seconds)
+Full moon night | 1 | 2k (2 seconds)
 
 I tested using an MSP430.  My light meter was a cheap model "HS1010" not really capable of measuring less than 1 lux.
 
