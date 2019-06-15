@@ -29,8 +29,8 @@ Thus you can have two output rails.
 
 The basic configurations:
    1.  SC-diode (no BQ25570 at all)
-   2a.  Supercapacitor on VBAT pin, load on VSTOR and VOUT
-   2b.  Supercapacitor on VBAT pin, load on VOUT
+   2. a. Supercapacitor on VBAT pin, load on VSTOR and VOUT
+   2. b.  Supercapacitor on VBAT pin, load on VOUT
    3.  Supercapacitor and load on VOUT pin
 
 The considerations are:
@@ -60,10 +60,10 @@ I have implemented this with an MSP430FR2433 and two IXYS KXOB22-04x3 solar cell
 Configuration 2 Supercapacitor on VBAT pin, load on VSTOR and VOUT
 ---
 
-It can coldstart very slowly, since:
-   - coldstart efficiency is about 10% 
+It can coldstart very slowly, since in coldstart:
+   - boost efficiency is about 10% 
    - the BQ clamps the solar cell to 0.3V which can be far from its MPP
-   - coldstart lasts until the supercap on VBAT is charged to Vchgen==1.8V
+   - lasts until the largish supercap on VBAT is charged to Vchgen==1.8V
 
 You can charge the capacitor to 5V, using its full capacity.
 
@@ -78,7 +78,7 @@ TI recommends putting the load on VSTOR ***when batteries are used***.
 If you are using batteries, putting the load on VSTOR protects the battery from undervoltage,
 since the BQ disconnects VBAT from VSTOR in that condition.
 
-Not that the buck converter is powered from the VSTOR net.
+Note that the buck converter is powered from the VSTOR net.
 So a load on VOUT is on the VSTOR net also, just with level conversion of the buck converter.
 The buck converter will drain VBAT only to 2V anyway (to the hardwired Vbat_uv=1.95V of the BQ.)
 (The BQ25505 lets you configure Vbat_uv.)
