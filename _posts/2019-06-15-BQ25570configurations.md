@@ -7,10 +7,10 @@ date: 2019-05-10
 
 Texas Instrument's BQ25570 chip is an energy harvester.
 
-You can configure it several ways, i.e. where do you connect the load and the storage.
-(This is not about how you also configure various voltage thresholds using resistor nets.)
+You can configure it several ways, re where do you connect the load and the storage?
+(Not discussing how you also configure various voltage thresholds using resistor nets.)
 
-This is about supercap storage, not a battery.  Thats another basic configuration: what kind of storage to use.
+Discussing supercap storage, not a battery.  (Not discussing what kind of storage to use.)
 
 Read "Fast charging a supercapacitor from energy-harvesters"
 http://www.edn.com/design/power-management/4422103/Fast-charging-a-supercapacitor-from-energy-harvesters
@@ -25,10 +25,12 @@ Background
 The BQ25570 has two converters:
    - charging (boost) converter, step-up to pin VBAT
    - regulating (buck) converter, step-down to pin VOUT
+Thus you can have two output rails.
 
 The basic configurations:
    1.  SC-diode (no BQ25570 at all)
-   2.  Supercapacitor on VBAT pin, load on VSTOR and VOUT
+   2a.  Supercapacitor on VBAT pin, load on VSTOR and VOUT
+   2b.  Supercapacitor on VBAT pin, load on VOUT
    3.  Supercapacitor and load on VOUT pin
 
 The considerations are:
@@ -42,7 +44,7 @@ The considerations are:
 Configuration 1 SC-diode (no BQ25570 at all)
 ---
 
-The voltage is unregulated. 
+The voltage out is unregulated. 
  
 The solar cell can operate inefficiently (off MPP) much of the time.
 
@@ -52,13 +54,16 @@ It constrains your choice of solar cells to those whose Voc is less than the Vma
 
 It charges fast, there is no coldstart of the energy harvester.
 
-I have implemented this with an MSP430FR2433 and two IXYS KXOB22-04x3 solar cells in series generated Voc of 3.8V.
+I have implemented this with an MSP430FR2433 and two IXYS KXOB22-04x3 solar cells in series generating Voc of 3.8V.
 
 
 Configuration 2 Supercapacitor on VBAT pin, load on VSTOR and VOUT
 ---
 
-It can coldstart very slowly, since coldstart efficiency is about 10% and the BQ clamps the solar cell to 0.3V which can be far from its MPP.
+It can coldstart very slowly, since:
+   - coldstart efficiency is about 10% 
+   - the BQ clamps the solar cell to 0.3V which can be far from its MPP
+   - coldstart lasts until the supercap on VBAT is charged to Vchgen==1.8V
 
 You can charge the capacitor to 5V, using its full capacity.
 
@@ -66,15 +71,21 @@ Once you get past coldstart, it is efficient and thereafter accomodates even low
 
 You can use single solar cells have Voc of say > 0.6V.
 
-Load on VSTOR is unregulated, load on VOUT is regulated.
+Any load on VSTOR (config 2a) is unregulated, load on VOUT is regulated.
 
-Note that you do not necessarily need to put any load on VSTOR.
+Note that you don't have to wire a load to VSTOR pin.
 TI recommends putting the load on VSTOR ***when batteries are used***.
-If you are not using batteries, you don't need the load on VSTOR to protect the battery.
+If you are using batteries, putting the load on VSTOR protects the battery from undervoltage,
+since the BQ disconnects VBAT from VSTOR in that condition.
 
-This is the configuration I am now designing for,
-except that I will not put any load on VSTOR, all load on VOUT, regulated to 2.4V.
-I don't care that it coldstarts slowly since I intend that it would coldstart very rarely,
+Not that the buck converter is powered from the VSTOR net.
+So a load on VOUT is on the VSTOR net also, just with level conversion of the buck converter.
+The buck converter will drain VBAT only to 2V anyway (to the hardwired Vbat_uv=1.95V of the BQ.)
+(The BQ25505 lets you configure Vbat_uv.)
+
+I am now designing for configuration 2b,
+with no load wired to VSTOR, all load on VOUT, regulated to 2.4V.
+I don't care that it coldstarts slowly since I intend that the system coldstart very rarely,
 only for very low probability, extreme weather events (many days of dark.)
 The rest of the system (the MCU) will monitor voltage and just not operate so as to prevent
 conditions that might require coldstart.
