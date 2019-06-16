@@ -28,10 +28,11 @@ The BQ25570 has two converters:
 Thus you can have two output rails.
 
 The basic configurations:
-   1.  SC-diode (no BQ25570 at all)
-   2. a. Supercapacitor on VBAT pin, load on VSTOR and VOUT
-   2. b.  Supercapacitor on VBAT pin, load on VOUT
-   3.  Supercapacitor and load on VOUT pin
+   1. Solar cell and blocking diode (no BQ25570 at all)
+   2. Supercapacitor on VSTOR pin, load on VSTOR and VOUT
+   3. Supercapacitor on VBAT pin, a. load on VSTOR and VOUT b. load on VOUT only
+   4. Supercapacitor on VBAT pin, load on VOUT
+   5. Supercapacitor and load on VOUT pin
 
 The considerations are:
    - how fast it coldstarts and continues charging
@@ -41,8 +42,10 @@ The considerations are:
    - how efficient energy is harvested (MPPT)
    - what light conditions are accomodated
 
-Configuration 1 SC-diode (no BQ25570 at all)
+Configuration 1 Solar cell and blocking diode (no BQ25570 at all)
 ---
+
+See the referenced paper.
 
 The voltage out is unregulated. 
  
@@ -56,8 +59,15 @@ It charges fast, there is no coldstart of the energy harvester.
 
 I have implemented this with an MSP430FR2433 and two IXYS KXOB22-04x3 solar cells in series generating Voc of 3.8V.
 
+Configuration 2 Supercapacitor on VSTOR pin, load on VSTOR and VOUT
+---
 
-Configuration 2 Supercapacitor on VBAT pin, load on VSTOR and VOUT
+This is the configuration of some BQ25570 breakout boards, e.g. MikroElectronika MIKROE-1814 (except that does not bring VSTOR off the board conveniently so you can connect a load.)
+
+Same characteristics as for configuration 3.
+
+
+Configuration 3 Supercapacitor on VBAT pin, a. load on VSTOR and VOUT or b. load on VOUT only
 ---
 
 It can coldstart very slowly, since in coldstart:
@@ -79,9 +89,13 @@ If you are using batteries, putting the load on VSTOR protects the battery from 
 since the BQ disconnects VBAT from VSTOR in that condition.
 
 Note that the buck converter is powered from the VSTOR net.
-So a load on VOUT is on the VSTOR net also, just with level conversion of the buck converter.
-The buck converter will drain VBAT only to 2V anyway (to the hardwired Vbat_uv=1.95V of the BQ.)
+So a load on VOUT is on the VSTOR and VBAT nets also, just with level conversion of the buck converter.
+The buck converter will drain VSTOR and VBAT only to 2V anyway (to the hardwired Vbat_uv=1.95V of the BQ.)
 (The BQ25505 lets you configure Vbat_uv.)
+The referenced paper says that the buck converter has its own threshold (Vuvlo) which is slightly higher than Vbat_uv,
+but the datasheet does not say that.
+
+Note that the BQ dynamically switches a connection between VSTOR and VBAT, for under and over voltage conditions on VBAT.
 
 I am now designing for configuration 2b,
 with no load wired to VSTOR, all load on VOUT, regulated to 2.4V.
@@ -91,7 +105,7 @@ The rest of the system (the MCU) will monitor voltage and just not operate so as
 conditions that might require coldstart.
 
 
-Configuration 3  Supercapacitor and load on VOUT pin
+Configuration 4  Supercapacitor and load on VOUT pin
 ---
 
 Coldstarts and charges relatively fast (the whole point of the referenced paper.)
